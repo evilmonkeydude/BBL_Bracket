@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interactive NFL Bracket</title>
+<style>
+  body { font-family: Arial, sans-serif; background: #f0f0f0; text-align: center; margin: 0; padding: 0; }
+  h1 { margin-top: 20px; }
+  .bracket { display: flex; justify-content: center; flex-wrap: wrap; margin: 30px; }
+  .round { display: flex; flex-direction: column; margin: 0 20px; }
+  .match { display: flex; flex-direction: column; align-items: center; margin: 20px 0; cursor: pointer; }
+  .team { display: flex; flex-direction: column; align-items: center; margin: 5px 0; }
+  .team img { width: 80px; height: 80px; object-fit: cover; border-radius: 50%; border: 2px solid #333; }
+  .winner { margin-top: 10px; font-weight: bold; color: #007700; }
+</style>
+</head>
+<body>
+
+<h1>Custom NFL Bracket</h1>
+
+<div class="bracket">
+  <!-- Round 1 -->
+  <div class="round" id="round1">
+    <div class="match" onclick="advanceWinner(0,1,16)">
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team1.png" alt="Team 1">
+        <p>Team 1</p>
+      </div>
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team2.png" alt="Team 2">
+        <p>Team 2</p>
+      </div>
+    </div>
+    <div class="match" onclick="advanceWinner(2,3,16)">
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team3.png" alt="Team 3">
+        <p>Team 3</p>
+      </div>
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team4.png" alt="Team 4">
+        <p>Team 4</p>
+      </div>
+    </div>
+    <div class="match" onclick="advanceWinner(4,5,16)">
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team5.png" alt="Team 5">
+        <p>Team 5</p>
+      </div>
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team6.png" alt="Team 6">
+        <p>Team 6</p>
+      </div>
+    </div>
+    <div class="match" onclick="advanceWinner(6,7,16)">
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team7.png" alt="Team 7">
+        <p>Team 7</p>
+      </div>
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team8.png" alt="Team 8">
+        <p>Team 8</p>
+      </div>
+    </div>
+    <div class="match" onclick="advanceWinner(8,9,16)">
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team9.png" alt="Team 9">
+        <p>Team 9</p>
+      </div>
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team10.png" alt="Team 10">
+        <p>Team 10</p>
+      </div>
+    </div>
+    <div class="match" onclick="advanceWinner(10,11,16)">
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team11.png" alt="Team 11">
+        <p>Team 11</p>
+      </div>
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team12.png" alt="Team 12">
+        <p>Team 12</p>
+      </div>
+    </div>
+    <div class="match" onclick="advanceWinner(12,13,16)">
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team13.png" alt="Team 13">
+        <p>Team 13</p>
+      </div>
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team14.png" alt="Team 14">
+        <p>Team 14</p>
+      </div>
+    </div>
+    <div class="match" onclick="advanceWinner(14,15,16)">
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team15.png" alt="Team 15">
+        <p>Team 15</p>
+      </div>
+      <div class="team" onclick="changeTeam(this)">
+        <img src="team16.png" alt="Team 16">
+        <p>Team 16</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Round 2 -->
+  <div class="round" id="round2"></div>
+
+  <!-- Semifinals -->
+  <div class="round" id="semifinals"></div>
+
+  <!-- Finals -->
+  <div class="round" id="finals"></div>
+
+  <!-- Champion -->
+  <div class="round" id="champion"></div>
+</div>
+
+<script>
+let teams = Array.from({length:16}, (_,i)=>({
+  name: "Team " + (i+1),
+  img: "team" + (i+1) + ".png"
+}));
+
+function changeTeam(element) {
+  event.stopPropagation(); // Prevent advancing when clicking
+  const newImg = prompt("Enter URL of new team image:");
+  const newName = prompt("Enter new team name:");
+  if (newImg) {
+    element.querySelector("img").src = newImg;
+    teams[element.parentElement.dataset.index].img = newImg;
+  }
+  if (newName) {
+    element.querySelector("p").textContent = newName;
+    teams[element.parentElement.dataset.index].name = newName;
+  }
+}
+
+// Advance winner from a match to next round
+function advanceWinner(index1,index2,nextRoundLength) {
+  const team1 = teams[index1];
+  const team2 = teams[index2];
+  const winnerName = prompt(`Who wins?\n1: ${team1.name}\n2: ${team2.name}`);
+  let winner = (winnerName == "1") ? team1 : team2;
+  
+  const nextRound = Math.floor(index1/2);
+  teams[nextRoundLength + nextRound] = winner; // Add to next round array
+  
+  renderBracket();
+}
+
+// Render the bracket visually
+function renderBracket() {
+  function createRoundHTML(start, length, id) {
+    const roundDiv = document.getElementById(id);
+    roundDiv.innerHTML = "";
+    for(let i=start;i<start+length;i+=2){
+      if(!teams[i] || !teams[i+1]) continue;
+      const matchDiv = document.createElement("div");
+      matchDiv.className = "match";
+      matchDiv.dataset.index = i;
+
+      [i,i+1].forEach(idx=>{
+        const teamDiv = document.createElement("div");
+        teamDiv.className = "team";
+        teamDiv.onclick = ()=>changeTeam(teamDiv);
+        const img = document.createElement("img");
+        img.src = teams[idx].img;
+        const p = document.createElement("p");
+        p.textContent = teams[idx].name;
+        teamDiv.appendChild(img);
+        teamDiv.appendChild(p);
+        matchDiv.appendChild(teamDiv);
+      });
+      roundDiv.appendChild(matchDiv);
+    }
+  }
+  createRoundHTML(0,16,"round1");
+  createRoundHTML(16,8,"round2");
+  createRoundHTML(24,4,"semifinals");
+  createRoundHTML(28,2,"finals");
+  if(teams[30]){
+    const champDiv = document.getElementById("champion");
+    champDiv.innerHTML = `<div class="team winner"><img src="${teams[30].img}"><p>${teams[30].name}</p></div>`;
+  }
+}
+
+renderBracket();
+</script>
+
+</body>
+</html>
